@@ -7,10 +7,21 @@ class ProxyAwareHttpClient implements HttpClient {
   final PlatformProxy _platformProxy;
   final Map<String, String> _cache = {};
 
-  ProxyAwareHttpClient({HttpClient client, PlatformProxy platformProxy})
+  ProxyAwareHttpClient(
+      {required HttpClient client, required PlatformProxy platformProxy})
       : _delegate = client,
         _platformProxy = platformProxy {
     _delegate.findProxy = _findProxy;
+  }
+
+  @override
+  set connectionFactory(newConnectionFactory) {
+    _delegate.connectionFactory = newConnectionFactory;
+  }
+
+  @override
+  set keyLog(newKeyLog) {
+    _delegate.keyLog = newKeyLog;
   }
 
   @override
@@ -113,24 +124,24 @@ class ProxyAwareHttpClient implements HttpClient {
 
   @override
   set authenticate(
-          Future<bool> Function(Uri url, String scheme, String realm) f) =>
+          Future<bool> Function(Uri url, String scheme, String? realm)? f) =>
       _delegate.authenticate = f;
 
   @override
   set authenticateProxy(
           Future<bool> Function(
-                  String host, int port, String scheme, String realm)
+                  String host, int port, String scheme, String? realm)?
               f) =>
       _delegate.authenticateProxy = f;
 
   @override
   set badCertificateCallback(
-          bool Function(X509Certificate cert, String host, int port)
+          bool Function(X509Certificate cert, String host, int port)?
               callback) =>
       _delegate.badCertificateCallback = callback;
 
   @override
-  set findProxy(String Function(Uri url) f) => _delegate.findProxy = f;
+  set findProxy(String Function(Uri url)? f) => _delegate.findProxy = f;
 
   @override
   bool get autoUncompress => _delegate.autoUncompress;
@@ -139,10 +150,10 @@ class ProxyAwareHttpClient implements HttpClient {
   set autoUncompress(bool value) => _delegate.autoUncompress = value;
 
   @override
-  Duration get connectionTimeout => _delegate.connectionTimeout;
+  Duration get connectionTimeout => _delegate.connectionTimeout!;
 
   @override
-  set connectionTimeout(Duration value) => _delegate.connectionTimeout = value;
+  set connectionTimeout(Duration? value) => _delegate.connectionTimeout = value;
 
   @override
   Duration get idleTimeout => _delegate.idleTimeout;
@@ -151,17 +162,17 @@ class ProxyAwareHttpClient implements HttpClient {
   set idleTimeout(Duration value) => _delegate.idleTimeout = value;
 
   @override
-  int get maxConnectionsPerHost => _delegate.maxConnectionsPerHost;
+  int get maxConnectionsPerHost => _delegate.maxConnectionsPerHost!;
 
   @override
-  set maxConnectionsPerHost(int value) =>
+  set maxConnectionsPerHost(int? value) =>
       _delegate.maxConnectionsPerHost = value;
 
   @override
-  String get userAgent => _delegate.userAgent;
+  String get userAgent => _delegate.userAgent!;
 
   @override
-  set userAgent(String value) => _delegate.userAgent = value;
+  set userAgent(String? value) => _delegate.userAgent = value;
 
   String _findProxy(Uri url) {
     var cacheValue = _cache[url.cacheKey];
@@ -174,7 +185,7 @@ class ProxyAwareHttpClient implements HttpClient {
 
     print("FIND PROXY $url $cacheValue");
     if (cacheValue == null || cacheValue.isEmpty) {
-      return null;
+      return "DIRECT";
     }
     return cacheValue;
   }
