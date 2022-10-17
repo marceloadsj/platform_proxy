@@ -183,7 +183,6 @@ class ProxyAwareHttpClient implements HttpClient {
       cacheValue = _cache[url.cacheKey];
     }
 
-    print("FIND PROXY $url $cacheValue");
     if (cacheValue == null || cacheValue.isEmpty) {
       return "DIRECT";
     }
